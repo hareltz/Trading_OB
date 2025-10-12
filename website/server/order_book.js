@@ -11,6 +11,8 @@ class OrderBookTracker {
         this.logFile = `${outputDir}/${this.symbol}_log.txt`;
         this.orderBook = { bids: {}, asks: {} };
         this.currentInterval = "1m";
+        this.bBlocks = [];
+        this.aBlocks = [];
         this.ws = null;
 
         if (!fs.existsSync(outputDir)) {
@@ -28,6 +30,45 @@ class OrderBookTracker {
         } catch (err) {
             console.error("Initialization error:", err);
         }
+    }
+
+    groupStrongLevels(side, threshold = 0.001) 
+    {
+        // Convert object to array of {price, qty}
+        const levels = Object.entries(this.orderBook[side]).map(([price, qty]) => ({
+            price: Number(price),
+            qty: qty
+        }));
+
+        // Sort ascending
+        levels.sort((a, b) => a.price - b.price);
+    
+        const boxes = [];
+        let currentBox = null;
+    
+        for (const level of levels) {
+            if (level.qty < threshold) {
+                // Skip weak levels
+                if (currentBox) {
+                    boxes.push(currentBox);
+                    currentBox = null;
+                }
+                continue;
+            }
+    
+            if (!currentBox) {
+                // Start new box
+                currentBox = { startPrice: level.price, endPrice: level.price, volume: level.qty };
+            } else {
+                currentBox.endPrice = level.price;
+                currentBox.volume += level.qty;
+            }
+        }
+    
+        // Push the last box
+        if (currentBox) boxes.push(currentBox);
+    
+        return boxes;
     }
 
     async loadSnapshot() {
@@ -70,6 +111,15 @@ class OrderBookTracker {
             this.updateBook("bids", data.b);
             this.updateBook("asks", data.a);
             this.logEvent(message);
+
+            this.bBlocks = this.groupStrongLevels("bids");
+            this.aBlocks = this.groupStrongLevels("asks");
+            
+            // console.log("\n\n\nb blocks: \n\n\n")
+            // console.log(this.bBlocks);
+            
+            // console.log("\n\n\na blocks: \n\n\n")
+            // console.log(this.aBlocks);
         } catch (err) {
             console.error("Failed to process message:", err);
         }
@@ -102,4 +152,10 @@ class OrderBookTracker {
     }
 }
 
+// Start the tracker
+// const tracker = new OrderBookTracker("btcusdt");
+// tracker.start();
+
 export default OrderBookTracker;
+
+

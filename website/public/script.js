@@ -88,6 +88,11 @@ function startWebSocket(interval) {
             console.log('WebSocket closed, reconnecting...');
             setTimeout(() => startWebSocket(interval), 2000);
         }
+        else
+        {
+            try { ws.close(); }
+            catch {}
+        }
     };
 }
 

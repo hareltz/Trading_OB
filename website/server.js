@@ -15,9 +15,15 @@ app.use(express.static(path.join(__dirname, "public")));
 const tracker = new OrderBookTracker("btcusdt");
 tracker.start();
 
-// Optional: API endpoint for latest order book
-app.get("/api/orderbook", (req, res) => {
-    res.json(tracker.orderBook);
+// Optional: API endpoint for latest asksBlocks
+app.get("/api/asksBlocks", (req, res) => {
+    res.json(tracker.aBlocks);
+});
+
+// Optional: API endpoint for latest bidsBlocks
+app.get("/api/bidsBlocks", (req, res) => {
+    console.log("tracker.bBlocks type:", typeof tracker.bBlocks, tracker.bBlocks);
+    res.json(tracker.bBlocks);
 });
 
 // Start server
