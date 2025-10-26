@@ -4,7 +4,7 @@ import fs from "fs";
 import fetch from "node-fetch";
 
 class OrderBookTracker {
-    constructor(symbol, outputDir = "order_book") {
+    constructor(symbol, outputDir = "server/order_book") {
         this.symbol = symbol.toLowerCase();
         this.outputDir = outputDir;
         this.jsonFile = `${outputDir}/${this.symbol}.json`;
