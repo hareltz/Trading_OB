@@ -47,7 +47,7 @@ async function loadChart(interval) {
     if (ws) ws.close();
     currentInterval = interval;
     candlestickSeries.setData([]);
-    
+
     const data = await fetchKlines(interval);
     candlestickSeries.setData(data);
 
@@ -83,15 +83,11 @@ function startWebSocket(interval) {
     ws.onclose = () => {
         // try to open the websocket only if the
         // currentInterval in the interval of the function
-        if (currentInterval == interval) 
-        {
+        if (currentInterval == interval) {
             console.log('WebSocket closed, reconnecting...');
             setTimeout(() => startWebSocket(interval), 2000);
-        }
-        else
-        {
-            try { ws.close(); }
-            catch {}
+        } else {
+            try { ws.close(); } catch {}
         }
     };
 }
@@ -129,6 +125,22 @@ timeframeButtons.forEach(btn => {
         sendIntervalWS(btn.dataset.interval);
     });
 });
+
+async function fetchAsksBidsBlocks() {
+    try {
+        const resA = await fetch("/api/asksBlocks");
+        const resB = await fetch("/api/bidsBlocks");
+
+        const asks = await resA.json();
+        const bids = await resB.json();
+        console.log("Asks blocks:", asks);
+        console.log("Bids blocks:", bids);
+    } catch (err) {
+        console.error("Failed to fetch asks blocks:", err);
+    }
+}
+
+setInterval(fetchAsksBidsBlocks, 1000); // 1 min
 
 // Initial load
 loadChart(currentInterval);

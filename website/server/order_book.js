@@ -32,8 +32,7 @@ class OrderBookTracker {
         }
     }
 
-    groupStrongLevels(side, threshold = 0.001) 
-    {
+    groupStrongLevels(side, threshold = 0.001) {
         // Convert object to array of {price, qty}
         const levels = Object.entries(this.orderBook[side]).map(([price, qty]) => ({
             price: Number(price),
@@ -42,10 +41,10 @@ class OrderBookTracker {
 
         // Sort ascending
         levels.sort((a, b) => a.price - b.price);
-    
+
         const boxes = [];
         let currentBox = null;
-    
+
         for (const level of levels) {
             if (level.qty < threshold) {
                 // Skip weak levels
@@ -55,7 +54,7 @@ class OrderBookTracker {
                 }
                 continue;
             }
-    
+
             if (!currentBox) {
                 // Start new box
                 currentBox = { startPrice: level.price, endPrice: level.price, volume: level.qty };
@@ -64,10 +63,10 @@ class OrderBookTracker {
                 currentBox.volume += level.qty;
             }
         }
-    
+
         // Push the last box
         if (currentBox) boxes.push(currentBox);
-    
+
         return boxes;
     }
 
@@ -114,10 +113,10 @@ class OrderBookTracker {
 
             this.bBlocks = this.groupStrongLevels("bids");
             this.aBlocks = this.groupStrongLevels("asks");
-            
+
             // console.log("\n\n\nb blocks: \n\n\n")
             // console.log(this.bBlocks);
-            
+
             // console.log("\n\n\na blocks: \n\n\n")
             // console.log(this.aBlocks);
         } catch (err) {
@@ -157,5 +156,3 @@ class OrderBookTracker {
 // tracker.start();
 
 export default OrderBookTracker;
-
-

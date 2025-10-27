@@ -5,7 +5,8 @@ import { fileURLToPath } from "url";
 import { WebSocketServer } from "ws";
 import OrderBookTracker from "./server/order_book.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url)); // get the current path
+const __dirname = path.dirname(fileURLToPath(
+    import.meta.url)); // get the current path
 const app = express(); // creating express application 
 
 // Serve static files from /public
